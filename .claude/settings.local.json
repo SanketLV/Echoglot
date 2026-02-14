@@ -1,0 +1,11 @@
+{
+  "enabledMcpjsonServers": [
+    "DeepGraph React MCP",
+    "DeepGraph Next.js MCP",
+    "DeepGraph TypeScript MCP",
+    "context7",
+    "memory",
+    "executeautomation-playwright-server",
+    "MCP_DOCKER"
+  ]
+}
