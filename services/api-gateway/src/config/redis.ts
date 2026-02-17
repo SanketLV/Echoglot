@@ -1,4 +1,4 @@
-import Redis from 'ioredis';
+import { Redis } from 'ioredis';
 import { env } from './env.js';
 
 function createRedisClient(): Redis | null {
@@ -12,7 +12,7 @@ function createRedisClient(): Redis | null {
     lazyConnect: true,
   });
 
-  client.on('error', (err) => {
+  client.on('error', (err: Error) => {
     console.error('[redis] Connection error:', err.message);
   });
 

@@ -9,6 +9,9 @@ import healthRoutes from './routes/health/index.js';
 import authRoutes from './routes/auth/index.js';
 import userRoutes from './routes/users/index.js';
 import contactRoutes from './routes/contacts/index.js';
+import conversationRoutes from './routes/conversations/index.js';
+import websocketPlugin from './plugins/websocket.js';
+import chatWsRoute from './routes/ws/chat.js';
 
 async function main(): Promise<void> {
   const fastify = Fastify({
@@ -25,6 +28,7 @@ async function main(): Promise<void> {
   await fastify.register(cors, { origin: env.CORS_ORIGIN, credentials: true });
   await fastify.register(errorHandlerPlugin);
   await fastify.register(authPlugin);
+  await fastify.register(websocketPlugin);
 
   // Routes - all under /v1
   await fastify.register(
@@ -33,9 +37,13 @@ async function main(): Promise<void> {
       await v1.register(authRoutes, { prefix: '/auth' });
       await v1.register(userRoutes, { prefix: '/users' });
       await v1.register(contactRoutes, { prefix: '/contacts' });
+      await v1.register(conversationRoutes, { prefix: '/conversations' });
     },
     { prefix: '/v1' },
   );
+
+  // WebSocket routes (outside /v1 prefix)
+  await fastify.register(chatWsRoute);
 
   try {
     await fastify.listen({ port: env.PORT, host: '0.0.0.0' });

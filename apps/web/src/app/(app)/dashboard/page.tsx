@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Languages, Mic, MessageSquare } from 'lucide-react';
 
 import { useUserStore } from '@/stores/user-store';
@@ -19,15 +20,15 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="glass-panel p-6 space-y-3">
+        <Link href="/chat" className="glass-panel p-6 space-y-3 block transition-colors hover:bg-subtle">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-500/10">
             <MessageSquare className="h-5 w-5 text-accent-500" />
           </div>
           <h3 className="text-app-heading text-text-primary">Chat Translation</h3>
           <p className="text-app-caption text-text-tertiary">
-            Coming in Phase 2 — real-time text translation across languages.
+            Send messages in any language — automatically translated in real time.
           </p>
-        </div>
+        </Link>
 
         <div className="glass-panel p-6 space-y-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-live-500/10">
@@ -54,10 +55,10 @@ export default function DashboardPage() {
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent-glow">
           <Languages className="h-8 w-8 text-accent-500" />
         </div>
-        <h2 className="text-heading-md text-text-primary">Ready for Phase 2</h2>
+        <h2 className="text-heading-md text-text-primary">Start Chatting</h2>
         <p className="text-body-md text-text-secondary max-w-md mx-auto">
-          Your account is set up and ready to go. Chat translation features will be available soon.
-          In the meantime, head to Settings to configure your profile and language preferences.
+          Your account is set up and ready to go. Head to Chat to start sending messages
+          across languages, or visit Settings to configure your language preferences.
         </p>
       </div>
     </div>
