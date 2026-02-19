@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useMessages } from '@/hooks/use-messages';
-import { useChatWs } from '@/hooks/use-chat-ws';
+import { useChatActions } from '@/hooks/use-chat-actions';
 import { useChatStore } from '@/stores/chat-store';
 import { useUserStore } from '@/stores/user-store';
 import { ChatHeader } from '@/components/chat/chat-header';
@@ -13,10 +13,10 @@ import { MessageInput } from '@/components/chat/message-input';
 export default function ConversationPage() {
   const params = useParams<{ conversationId: string }>();
   const conversationId = params.conversationId;
-  const { sendMessage, startTyping, stopTyping, sendReadReceipt } = useChatWs();
+  const { sendMessage, startTyping, stopTyping, sendReadReceipt } = useChatActions();
   const setActiveConversation = useChatStore((s) => s.setActiveConversation);
   const setMessages = useChatStore((s) => s.setMessages);
-  const storeMessages = useChatStore((s) => s.messages[conversationId] ?? []);
+  const storeMessages = useChatStore((s) => s.messages[conversationId]) ?? [];
   const markAsRead = useChatStore((s) => s.markAsRead);
   const conversations = useChatStore((s) => s.conversations);
   const user = useUserStore((s) => s.user);
@@ -33,11 +33,15 @@ export default function ConversationPage() {
     return () => setActiveConversation(null);
   }, [conversationId, setActiveConversation, sendReadReceipt, markAsRead]);
 
-  // Sync fetched messages to store
+  // Sync fetched messages to store, preserving any WS-added messages not yet in query cache
   useEffect(() => {
     if (data?.pages) {
-      const allMessages = data.pages.flatMap((p) => p.messages).reverse();
-      setMessages(conversationId, allMessages);
+      const fetched = data.pages.flatMap((p) => p.messages).reverse();
+      const current = useChatStore.getState().messages[conversationId] ?? [];
+      const fetchedIds = new Set(fetched.map((m) => m.id));
+      // Keep WS-only messages (too new to be in the fetched pages) at the tail
+      const wsOnlyTail = current.filter((m) => !fetchedIds.has(m.id));
+      setMessages(conversationId, [...fetched, ...wsOnlyTail]);
     }
   }, [data, conversationId, setMessages]);
 

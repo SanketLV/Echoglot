@@ -59,11 +59,18 @@ export default async function chatWsRoute(fastify: FastifyInstance): Promise<voi
             // Store original message
             const message = await createMessage(conversationId, userId, content);
 
-            // Send ack to sender
+            // Send ack to sender with full message so it appears in their UI
             socket.send(JSON.stringify({
               type: 'message.ack',
-              messageId: message.id,
               conversationId,
+              message: {
+                id: message.id,
+                conversationId: message.conversation_id,
+                senderId: message.sender_id,
+                content: message.content,
+                createdAt: message.created_at,
+                translation: null,
+              },
             }));
 
             // Get conversation members to translate and deliver

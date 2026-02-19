@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { LayoutDashboard, MessageSquare, Settings, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Users, Settings, PanelLeftClose, PanelLeft } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage, Button } from '@echoglot/ui';
 import { cn } from '@echoglot/ui/lib/utils';
@@ -13,6 +13,7 @@ import { useUserStore } from '@/stores/user-store';
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/chat', label: 'Chat', icon: MessageSquare },
+  { href: '/contacts', label: 'Contacts', icon: Users },
   { href: '/settings', label: 'Settings', icon: Settings },
 ] as const;
 

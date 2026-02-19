@@ -54,13 +54,27 @@ export async function getMessages(
 
   if (error) throw error;
 
-  // Filter translations to only the user's preferred language
+  // Filter translations to only the user's preferred language, map to camelCase
   const messages = (data ?? []).map((msg) => {
     const translations = msg.translation ?? [];
     const userTranslation = translations.find((t: any) => t.target_lang === preferredLang);
+    const translation = userTranslation
+      ? {
+          id: userTranslation.id,
+          messageId: userTranslation.message_id,
+          targetLang: userTranslation.target_lang,
+          translatedContent: userTranslation.translated_content,
+          engine: userTranslation.engine,
+          createdAt: userTranslation.created_at,
+        }
+      : null;
     return {
-      ...msg,
-      translation: userTranslation ?? null,
+      id: msg.id,
+      conversationId: msg.conversation_id,
+      senderId: msg.sender_id,
+      content: msg.content,
+      createdAt: msg.created_at,
+      translation,
     };
   });
 

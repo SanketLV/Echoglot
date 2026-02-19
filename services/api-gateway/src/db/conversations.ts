@@ -33,7 +33,16 @@ export async function listConversations(userId: string) {
     const sorted = [...messages].sort(
       (a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
-    const lastMessage = sorted[0] ?? null;
+    const raw = sorted[0];
+    const lastMessage = raw
+      ? {
+          id: raw.id,
+          conversationId: conv.id,
+          senderId: raw.sender_id,
+          content: raw.content,
+          createdAt: raw.created_at,
+        }
+      : undefined;
     const unreadCount = messages.filter(
       (m: any) => m.sender_id !== userId && new Date(m.created_at) > new Date(lastReadAt),
     ).length;

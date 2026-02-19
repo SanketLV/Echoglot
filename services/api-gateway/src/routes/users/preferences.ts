@@ -3,7 +3,7 @@ import { getPreferences, upsertPreferences } from '../../db/preferences.js';
 import { updatePreferencesBody } from '../../schemas/user.js';
 
 export default async function preferencesRoutes(fastify: FastifyInstance): Promise<void> {
-  fastify.get('/preferences', async (request, reply) => {
+  fastify.get('/me/preferences', async (request, reply) => {
     if (!request.user) {
       reply.code(401).send({
         success: false,
@@ -17,7 +17,7 @@ export default async function preferencesRoutes(fastify: FastifyInstance): Promi
     return { success: true, data: prefs };
   });
 
-  fastify.patch('/preferences', async (request, reply) => {
+  fastify.patch('/me/preferences', async (request, reply) => {
     if (!request.user) {
       reply.code(401).send({
         success: false,

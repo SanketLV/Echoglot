@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { z } from 'zod';
 
 const envSchema = z.object({
@@ -7,7 +8,7 @@ const envSchema = z.object({
   REDIS_URL: z.string().url().optional(),
   DEEPL_API_KEY: z.string().min(1).optional(),
   GOOGLE_TRANSLATE_API_KEY: z.string().min(1).optional(),
-  TRANSLATION_MOCK: z.coerce.boolean().default(true),
+  TRANSLATION_MOCK: z.coerce.boolean().default(false),
   PORT: z.coerce.number().int().positive().default(4000),
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
 });

@@ -4,6 +4,7 @@ import { create } from 'zustand';
 
 import type {
   ConversationPreview,
+  Message,
   MessageWithTranslation,
 } from '@echoglot/shared-types';
 
@@ -29,6 +30,7 @@ interface ChatState {
   ) => void;
   addTypingUser: (conversationId: string, userId: string) => void;
   removeTypingUser: (conversationId: string, userId: string) => void;
+  updateConversationLastMessage: (conversationId: string, message: Message) => void;
   updateUnreadCount: (conversationId: string, count: number) => void;
   incrementUnread: (conversationId: string) => void;
   markAsRead: (conversationId: string) => void;
@@ -46,15 +48,16 @@ export const useChatStore = create<ChatState>((set) => ({
   setActiveConversation: (id) => set({ activeConversationId: id }),
 
   addMessage: (conversationId, message) =>
-    set((state) => ({
-      messages: {
-        ...state.messages,
-        [conversationId]: [
-          ...(state.messages[conversationId] ?? []),
-          message,
-        ],
-      },
-    })),
+    set((state) => {
+      const existing = state.messages[conversationId] ?? [];
+      if (existing.some((m) => m.id === message.id)) return state;
+      return {
+        messages: {
+          ...state.messages,
+          [conversationId]: [...existing, message],
+        },
+      };
+    }),
 
   setMessages: (conversationId, messages) =>
     set((state) => ({
@@ -92,6 +95,13 @@ export const useChatStore = create<ChatState>((set) => ({
           (id) => id !== userId,
         ),
       },
+    })),
+
+  updateConversationLastMessage: (conversationId, message) =>
+    set((state) => ({
+      conversations: state.conversations.map((c) =>
+        c.id === conversationId ? { ...c, lastMessage: message } : c,
+      ),
     })),
 
   updateUnreadCount: (conversationId, count) =>

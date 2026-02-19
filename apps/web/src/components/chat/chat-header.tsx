@@ -11,7 +11,7 @@ interface ChatHeaderProps {
 }
 
 export function ChatHeader({ otherMember, conversationId }: ChatHeaderProps) {
-  const typingUsers = useChatStore((s) => s.typingUsers[conversationId] ?? []);
+  const typingUsers = useChatStore((s) => s.typingUsers[conversationId]) ?? [];
   const memberUser = otherMember?.user;
   const name = memberUser?.display_name ?? 'Unknown';
   const avatar = memberUser?.avatar_url;
