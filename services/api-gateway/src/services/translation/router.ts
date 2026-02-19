@@ -1,11 +1,12 @@
 import type { TranslationEngine, TranslationResult } from './types.js';
 import { TranslationCache } from './cache.js';
 import { MockEngine } from './engines/mock.js';
+import { MyMemoryEngine } from './engines/mymemory.js';
 import { DeepLEngine } from './engines/deepl.js';
 import { GoogleEngine } from './engines/google.js';
 import { env } from '../../config/env.js';
 
-// European languages prefer DeepL
+// European languages where DeepL performs best
 const DEEPL_PREFERRED = new Set(['en', 'es', 'fr', 'de', 'pt', 'ko', 'ja', 'zh']);
 
 export class TranslationRouter {
@@ -20,6 +21,7 @@ export class TranslationRouter {
       return;
     }
 
+    // Real engines in priority order
     if (env.DEEPL_API_KEY) {
       this.engines.push(new DeepLEngine(env.DEEPL_API_KEY));
     }
@@ -28,26 +30,24 @@ export class TranslationRouter {
       this.engines.push(new GoogleEngine(env.GOOGLE_TRANSLATE_API_KEY));
     }
 
-    // Always have mock as last fallback
-    this.engines.push(new MockEngine());
+    // MyMemory: free, no API key needed — always available as fallback
+    this.engines.push(new MyMemoryEngine());
   }
 
   private pickEngine(sourceLang: string, targetLang: string): TranslationEngine {
-    if (env.TRANSLATION_MOCK) {
-      return this.engines[0]!;
-    }
+    if (env.TRANSLATION_MOCK) return this.engines[0]!;
 
-    // Prefer DeepL for European languages
+    // Prefer DeepL for European languages when available
     if (DEEPL_PREFERRED.has(sourceLang) && DEEPL_PREFERRED.has(targetLang)) {
       const deepl = this.engines.find((e) => e.name === 'deepl');
       if (deepl) return deepl;
     }
 
-    // Google for everything else
+    // Google for everything else when available
     const google = this.engines.find((e) => e.name === 'google');
     if (google) return google;
 
-    // Fallback to last engine (always mock)
+    // MyMemory always available
     return this.engines[this.engines.length - 1]!;
   }
 
@@ -60,13 +60,21 @@ export class TranslationRouter {
     const cached = await this.cache.get(text, sourceLang, targetLang);
     if (cached) return cached;
 
-    // Pick engine and translate
     const engine = this.pickEngine(sourceLang, targetLang);
-    const result = await engine.translate({ text, sourceLang, targetLang });
 
-    // Cache result
+    let result: TranslationResult;
+    try {
+      result = await engine.translate({ text, sourceLang, targetLang });
+    } catch (err) {
+      // If primary engine fails, fall back to MyMemory
+      if (engine.name !== 'mymemory') {
+        result = await new MyMemoryEngine().translate({ text, sourceLang, targetLang });
+      } else {
+        throw err;
+      }
+    }
+
     await this.cache.set(text, sourceLang, targetLang, result);
-
     return result;
   }
 }
