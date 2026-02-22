@@ -8,6 +8,7 @@ function mapUserRow(row: Record<string, unknown>) {
     avatarUrl: row.avatar_url,
     preferredLang: row.preferred_lang,
     nativeLang: row.native_lang,
+    onboardingComplete: row.onboarding_complete,
     subscriptionTier: row.subscription_tier,
     voiceProfileId: row.voice_profile_id,
     createdAt: row.created_at,
@@ -33,6 +34,7 @@ export async function updateUser(id: string, updates: Record<string, unknown>) {
   if ('avatarUrl' in updates) mapped.avatar_url = updates.avatarUrl;
   if ('preferredLang' in updates) mapped.preferred_lang = updates.preferredLang;
   if ('nativeLang' in updates) mapped.native_lang = updates.nativeLang;
+  if ('onboardingComplete' in updates) mapped.onboarding_complete = updates.onboardingComplete;
 
   const { data, error } = await supabaseAdmin
     .from('users')

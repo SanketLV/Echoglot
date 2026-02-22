@@ -31,8 +31,8 @@ export function useUpdateProfile() {
       const response = await api.patch<User>('/v1/users/me', data);
       return response.data!;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    onSuccess: (updatedUser) => {
+      queryClient.setQueryData(['profile'], updatedUser);
     },
   });
 }

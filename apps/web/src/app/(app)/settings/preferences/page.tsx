@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 
-import { LanguageSelector } from '@/components/shared/language-selector';
 import { usePreferences, useUpdatePreferences } from '@/hooks/use-user';
 
 export default function PreferencesSettingsPage() {
@@ -12,8 +11,6 @@ export default function PreferencesSettingsPage() {
   const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('dark');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [autoTranslate, setAutoTranslate] = useState(true);
-  const [defaultInputLang, setDefaultInputLang] = useState('en');
-  const [defaultOutputLang, setDefaultOutputLang] = useState('es');
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -21,8 +18,6 @@ export default function PreferencesSettingsPage() {
       setTheme((preferences.theme as 'dark' | 'light' | 'system') || 'dark');
       setNotificationsEnabled(preferences.notificationsEnabled ?? true);
       setAutoTranslate(preferences.autoTranslate ?? true);
-      setDefaultInputLang(preferences.defaultInputLang || 'en');
-      setDefaultOutputLang(preferences.defaultOutputLang || 'es');
     }
   }, [preferences]);
 
@@ -31,7 +26,7 @@ export default function PreferencesSettingsPage() {
     setSaved(false);
 
     updatePreferences.mutate(
-      { theme, notificationsEnabled, autoTranslate, defaultInputLang, defaultOutputLang },
+      { theme, notificationsEnabled, autoTranslate },
       {
         onSuccess: () => {
           setSaved(true);
@@ -44,7 +39,7 @@ export default function PreferencesSettingsPage() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        {[1, 2, 3, 4, 5].map((i) => (
+        {[1, 2, 3].map((i) => (
           <div key={i} className="h-10 w-full animate-pulse rounded-lg bg-muted" />
         ))}
       </div>
@@ -114,20 +109,6 @@ export default function PreferencesSettingsPage() {
               }`}
             />
           </button>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-body-sm font-medium text-text-secondary">
-            Default Input Language
-          </label>
-          <LanguageSelector value={defaultInputLang} onValueChange={setDefaultInputLang} />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-body-sm font-medium text-text-secondary">
-            Default Output Language
-          </label>
-          <LanguageSelector value={defaultOutputLang} onValueChange={setDefaultOutputLang} />
         </div>
       </div>
 

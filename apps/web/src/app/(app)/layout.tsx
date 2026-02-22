@@ -1,19 +1,26 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { Sidebar } from '@/components/layout/sidebar';
 import { TopBar } from '@/components/layout/top-bar';
 import { useProfile, usePreferences } from '@/hooks/use-user';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const { data: profile } = useProfile();
   const { data: preferences } = usePreferences();
 
-  // Silence unused variable warnings - data is fetched to populate the store
   useEffect(() => {
-    // Profile and preferences are automatically synced to the store via query hooks
-  }, [profile, preferences]);
+    if (profile && !profile.onboardingComplete) {
+      router.replace('/onboarding');
+    }
+  }, [profile, router]);
+
+  useEffect(() => {
+    // Preferences are automatically synced to the store via query hooks
+  }, [preferences]);
 
   return (
     <div className="flex h-screen bg-primary">

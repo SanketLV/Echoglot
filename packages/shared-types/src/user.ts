@@ -7,6 +7,7 @@ export interface User {
   avatarUrl: string | null;
   preferredLang: SupportedLanguage;
   nativeLang: SupportedLanguage;
+  onboardingComplete: boolean;
   subscriptionTier: SubscriptionTier;
   voiceProfileId: string | null;
   createdAt: string;
